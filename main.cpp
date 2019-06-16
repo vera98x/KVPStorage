@@ -240,7 +240,7 @@ bool testFunctions() {
 
 int main() {
   container_c containerFile("config/config.json");
-  bool testing = true;
+  bool testing = false;
   if (testing) {
     if (testFunctions()) {
       std::cout << "All tests have passed\n";
@@ -249,6 +249,7 @@ int main() {
                 << "\n";
     }
   }
+
   while (1) {
     std::cout << "> ";
     std::cout << updateViaString(getLine(), containerFile) << "\n";
