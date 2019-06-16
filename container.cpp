@@ -12,12 +12,12 @@ bool container_c::readFile(Json::Value &parsedFile) {
   configFileRead.open(destination_file, std::ios::in);
   if (!configFileRead.is_open()) {
     std::ofstream configFileWrite;
-    //make file if it did not exist, fill with empty json
+    // make file if it did not exist, fill with empty json
     configFileWrite.open(destination_file, std::ios::out);
     Json::Value nothing;
     writeFile(nothing);
     configFileWrite.close();
-    //retry
+    // retry
     configFileRead.open(destination_file, std::ios::in);
     if (!configFileRead.is_open()) {
       errorMessage =
@@ -52,8 +52,11 @@ bool container_c::writeFile(const Json::Value &parsedFile) {
 }
 
 bool container_c::addElement(const std::string &key, const std::string &value) {
+  // get all values from json file
   Json::Value parsedFile;
-  readFile(parsedFile);
+  if (!readFile(parsedFile)) {
+    return false;
+  }
   if (parsedFile.get(key, "err-1") != "err-1") {
     while (1) {
       std::cout << "Key already exist, do you want to override? y/n \n";
@@ -67,33 +70,40 @@ bool container_c::addElement(const std::string &key, const std::string &value) {
       }
     }
   }
+  // add key to json value
   parsedFile[key] = value;
+  // write to file and return if it succeeded or not
   return writeFile(parsedFile);
 }
 
 std::string container_c::getElement(const std::string &key,
                                     const std::string &errorString) {
+  // read total file
   Json::Value parsedFile;
   if (!readFile(parsedFile)) {
     return errorString;
   }
+  // check if key is in file
   if (parsedFile.get(key, "err-1") == "err-1") {
     return " ";
   }
+  // return value of key
   return parsedFile[key].asString();
 }
 
 bool container_c::deleteElement(const std::string &key) {
+  // read total file
   Json::Value parsedFile;
   if (!readFile(parsedFile)) {
     return false;
   }
-
+  // check if key is in file
   if (parsedFile.get(key, "err-1") == "err-1") {
     errorMessage = "ERROR, key is not present in file";
     return false;
   }
-
+  // remove key from value
   parsedFile.removeMember(key);
+  // write to file and return if it succeeded or not
   return writeFile(parsedFile);
 }
